@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block content %}
+
+<!-- The main header -->
+<div class="jumbotron jumbotron-fluid">
+  <div class="container">
+    <h1 class="display-5" style="text-align:center;"><b>SLComply.ai</b></h1>
+    <br>
+    <p style="text-align:center;">A Sellafield Ltd and PA Consulting solution to accelerate from weeks to minutes the analysis of legislative and regulatory documents​</p>
+    <p class="small" style="text-align:center;">This pilot currently focuses on documents within Remediation only. For more information please contact Edwin Matthews.</p>
+  </div>
+</div>
+
+
+<!-- Top three recent changes table -->
+<div id="recent_change_table" class="stats-table"> <!-- style="height:700px;overflow:auto;"-->
+  <h6 id="table_heading" class="text-muted">Most recent changes in legislation and regulation</h6>
+  <br>
+  <table class="table table-bordered table-sm "> <!-- table-bordered table-striped  cellspacing="0" width="100%"-->
+   
+    <thead class="table-dark">
+      <tr>
+        <th scope="col" class="col-lg-4 align-top">Document
+        </th>
+        <th scope="col" class="col-lg-1 align-top">Revision Date
+        </th>
+        <th scope="col" class="col-lg-1 align-top text-center">Relevant
+        </th>
+        <th scope="col" class="col-lg-1 align-top text-center">Maybe Relevant
+        </th>
+        <!--
+        <th scope="col">Level of change
+        </th> -->
+        <th scope="col" class="col-lg-1 align-top text-center">Not Relevant
+        </th>
+      </tr>
+    </thead>
+
+    <tbody id="recent_changes">
+      <tr id="table_row">
+      </tr>
+      {% for doc_stats in top_docs_stats %}
+      <tr>
+        <td>{{ doc_stats['doc'] }}</td>
+        <td>{{ doc_stats['rev_formatted_date'] }}</td>
+        <td class="text-center">{{ doc_stats['relevant'] }}</td>
+        <td class="text-center">{{ doc_stats['maybe_relevant'] }}</td>
+        <td class="text-center">{{ doc_stats['not_relevant'] }}</td>
+    
+      {% endfor %}  
+    </tbody>
+
+  </table>
+</div>
+
+<br>
+      
+  {% endblock %}
+
+  {% block finalscript %}
+<script>
+  $('#home').toggleClass('active')
+</script>
+{% endblock %}

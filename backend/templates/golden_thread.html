@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% block content %}
+
+<head>
+  
+  <script src='https://cdn.plot.ly/plotly-latest.min.js'></script>
+    <script type='text/javascript'>
+      function plot_sankey(){
+        // get doc type selected by the user
+        var doc_typ_temp = document.getElementById("document_type");
+        var doc_typ = doc_typ_temp.options[doc_typ_temp.selectedIndex].value;
+
+        // get link relevancy type selected by the user
+        var link_rel_typ_temp = document.getElementById("maybe_link");
+        var link_rel_typ = link_rel_typ_temp.options[link_rel_typ_temp.selectedIndex].value;
+
+        // get recency selected by the user
+        var recency_temp = document.getElementById("recency_date");
+        var recency = recency_temp.options[recency_temp.selectedIndex].value;
+
+        var model_parameters = {
+          'document_type': doc_typ,
+          'maybe_link': link_rel_typ,
+          'recency_date': recency
+        }
+
+        $.getJSON({
+          url:"/plot_sankey", data: model_parameters, success: function (graph){
+            Plotly.newPlot('chart',graph,{});
+          }
+        })
+      }
+  </script>
+
+</head>
+
+<!-- Jumbotron -->
+<div class="jumbotron jumbotron-fluid">
+  <div class="container">
+    <h1 class="display-5" style="text-align:center;" id="sankey_header">Golden Thread</h1>
+    <br>
+    <p class="medium" style="text-align:center;">Identifying links between legislative/regulatory changes and our Sellafield Manuals and Practices.</p>
+    <p class="medium" style="text-align:center;">An interactive visualisation to go from big picture to detail in one click</p>
+    <br><br>
+    <div class="container-fluid">
+      <div class="row">
+        
+        <div class="col-sm-1"></div>
+        <!-- Document Type Dropdown -->
+        <div class="col-sm-2 text-center" id="sankey_first_dropdown">
+          <label for="document_type" class="select_label">Select type</label>
+          <br>
+          <select class="btn btn-secondary dropdown-toggle" type="button" id="document_type" data-toggle="dropdown"
+            aria-haspopup="true" aria-expanded="false" style="width: 100%;" onchange="link_rel_select();">
+            <div class="dropdown-menu" aria-labelledby="dropdownMenu2">
+              <option disabled selected value>Select doc type</option>
+              {% for type in DOC_TYPES %}
+              <option value="{{ type }}">{{ type }}</option>
+              {% endfor %}
+            </div>
+          </select>
+          <br><br>
+        </div>
+
+        
+        <!-- putting a dropdown for maybe link -->
+        <div class="col-sm-3 text-center"> 
+          <label for="maybe_link" class="select_label">Select link strength</label>
+          <br>
+          <select class="btn btn-secondary dropdown-toggle" type="button" id="maybe_link" data-toggle="dropdown"
+            aria-haspopup="true" aria-expanded="false" style="width: 100%;" onchange="rec_select();">
+            <option disabled selected value>Select type first</option>
+          </select>
+          <br><br>
+        </div>
+
+        
+
+        <!-- putting a dropdown for recency -->
+        <div class="col-sm-3 text-center"> 
+          <label for="recency_date" class="select_label">Select recency</label>
+          <br>
+          <select class="btn btn-secondary dropdown-toggle" type="button" id="recency_date" data-toggle="dropdown"
+            aria-haspopup="true" aria-expanded="false" style="width: 100%;">
+            <option disabled selected value>Select link strength first</option>
+          </select>
+          <br><br>
+        </div>
+
+        <!-- button when clicked will show the sankey plot -->
+        <div class="text-right">
+          <br>
+          <button id='gen_sankey' class="btn btn-secondary"  type="button" onclick="plot_sankey()">
+            Generate Golden Thread
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <br>
+    <div class="container w-75">
+      <div id='chart' class='chart'></div>
+    </div>
+    
+  </div>
+</div>
+
+{% endblock %}
+
+{% block finalscript %}
+<script>
+  $('#golden_thread').toggleClass('active')
+</script>
+{% endblock %}

@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+{% block content %}
+
+<head>
+  
+  <script src='https://cdn.plot.ly/plotly-latest.min.js'></script>
+    <script type='text/javascript'>
+      function plot_treemap(){
+        // get doc type selected by the user
+        var doc_typ_temp = document.getElementById("doc_typ");
+        var doc_typ = doc_typ_temp.options[doc_typ_temp.selectedIndex].value;
+
+        var docs_temp = document.getElementById("docs");
+        var docs = docs_temp.options[docs_temp.selectedIndex].value;
+
+        // get link relevancy type selected by the user
+        var link_rel_typ_temp = document.getElementById("maybe_link");
+        var link_rel_typ = link_rel_typ_temp.options[link_rel_typ_temp.selectedIndex].value;
+
+        // get recency selected by the user
+        var recency_temp = document.getElementById("recency_date");
+        var recency = recency_temp.options[recency_temp.selectedIndex].value;
+
+        var model_parameters = {
+          'document_type': doc_typ,
+          'docs': docs,
+          'maybe_link': link_rel_typ,
+          'recency_date': recency
+        }
+
+        $('#gen_treemap').prop("disabled", true);
+
+        // adding a loading image and message using bootstrap spinner
+        $('#chart').html(
+                         `<div class="d-flex justify-content-center">
+                            <div class="spinner-border text-success" role="status" id="loading_spinner">
+                            </div>
+                            <span id="loading_txt">&nbsp&nbspLoading...</span>
+                          </div>`
+                        );
+                
+        $.getJSON({
+          url:"/plot_treemap", data: model_parameters, success: function (graph){
+              Plotly.newPlot('chart',graph,{});
+              $('#gen_treemap').prop("disabled", false);
+              $('#loading_spinner').hide();
+              $('#loading_txt').hide();
+          }
+        })
+      }
+  </script>
+
+</head>
+
+<!-- Jumbotron -->
+<div class="jumbotron jumbotron-fluid">
+  <div class="container">
+    <h1 class="display-5" style="text-align:center;" id="treemap_header">Sellafield Document Impact Mapper</h1>
+    <br>
+    <p class="medium" style="text-align:center;">Grouping legislative and regulatory changes changes by the Sellafield documents they may impact.</p>
+    <p class="medium" style="text-align:center;">An interactive visualisation to go from big picture to detail in one click</p>
+    <br><br>
+    <div class="container-fluid">
+      <div class="row">
+
+       
+         <!-- Document Type Dropdown -->
+        <div class="col-sm-2 text-center" id="sankey_first_dropdown">
+          <label for="doc_typ" class="select_label">Select type</label>
+          <br>
+          <select class="btn btn-secondary dropdown-toggle" type="button" id="doc_typ" data-toggle="dropdown"
+            aria-haspopup="true" aria-expanded="false" style="width: 100%;" onchange="doc_select();">
+            <div class="dropdown-menu" aria-labelledby="dropdownMenu2">
+              <option disabled selected value>Select doc type</option>
+              {% for type in DOC_TYPES %}
+              <option value="{{ type }}">{{ type }}</option>
+              {% endfor %}
+            </div>
+          </select>
+          <br><br>
+        </div>
+       
+
+
+       <!-- Document Selection -->
+      <div class="col-sm-3 text-center"> 
+        <label for="docs" class="">Select document</label>
+        <br>
+        <select id="docs" name="docs" class="btn btn-secondary dropdown-toggle" style="width: 100%;" onchange="link_rel_select();">
+          <option disabled selected value>Select document type first</option>
+        </select>
+        <br><br>
+      </div>
+        
+
+        <!-- putting a dropdown for maybe link -->
+        <div class="col-sm-2 text-center"> 
+          <label for="maybe_link" class="select_label">Select link strength</label>
+          <br>
+          <select class="btn btn-secondary dropdown-toggle" type="button" id="maybe_link" data-toggle="dropdown"
+            aria-haspopup="true" aria-expanded="false" style="width: 100%;" onchange="rec_select();">
+            <option disabled selected value>Select type first</option>
+          </select>
+          <br><br>
+        </div>
+
+        
+
+        <!-- putting a dropdown for recency -->
+        <div class="col-sm-3 text-center"> 
+          <label for="recency_date" class="select_label">Select recency</label>
+          <br>
+          <select class="btn btn-secondary dropdown-toggle" type="button" id="recency_date" data-toggle="dropdown"
+            aria-haspopup="true" aria-expanded="false" style="width: 100%;" onchange="enable_button();">
+            <option disabled selected value>Select link strength first</option>
+          </select>
+          <br><br>
+        </div>
+
+        
+        <!-- button when clicked will display the treemap-->
+        <div class="text-right">
+          <br>
+          <button id='gen_treemap' class="btn btn-secondary"  type="button" disabled onclick="plot_treemap()" >
+            Generate Document Map
+          </button>
+        </div> 
+
+      </div>
+    </div>
+    <br>
+    
+    <div class="container">
+      
+      <div id='chart' class='chart'”></div>
+    </div>
+    
+  </div>
+</div>
+<!--
+<script src='https://cdn.plot.ly/plotly-latest.min.js'></script>
+<script type='text/javascript'>
+  /*
+  var graphs = {{graphJSON | safe}};
+  Plotly.plot('chart',graphs,{}); */
+  $.getJSON({
+          url:"/plot_treemap", success: function (graph){
+            Plotly.newPlot('chart',graph,{});
+          }
+        })
+</script>
+-->
+{% endblock %}
+
+{% block finalscript %}
+<script>
+  $('#doc_map').toggleClass('active')
+</script>
+{% endblock %}

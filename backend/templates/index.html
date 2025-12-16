@@ -1,0 +1,311 @@
+{% extends "base.html" %}
+{% block content %}
+
+
+<!-- Jumbotron -->
+<div class="jumbotron jumbotron-fluid">
+  <div class="container"> 
+    <!-- 
+    <h1 class="display-5" style="text-align:center;"><b>Mandatory Requirements AI Accelerator</b></h1>
+    -->
+
+    <!-- button when clicked will show the text in the below collapsible div-->
+    <div>
+      <button class="btn btn-secondary" id="instr_btn" data-toggle="collapse" data-target="#instructions" 
+      type="button" aria-expanded="false" aria-controls="instructions">
+        Instructions
+      </button>
+    </div>
+    <br> <br>
+    <!-- Collapsible Instructions Block -->
+    <div class="collapse" id="instructions">
+      <ul>
+        <li>This app can be used to identify changes between document revisions</li>
+        <li>Use the drop-down menus below to select:</li>
+        <ol>
+          <li>Document Type | whether a document is sourced from Gov.UK or not</li>
+          <li>Document</li>
+          <li>Recency</li>
+          <li>Section(s)</li>
+          <li>Relevance | select all changes, relevant, maybe relevant or not-relevant changes</li>
+        </ol>
+        <li>After selected:</li>
+          <ul>
+            <li>Key metrics will be provided (e.g. total number of changes identified in the document)</li>
+            <li>Detailed table of results which show all sentences (new or modified) that appear in the current revision for
+                the section(s) selected
+            </li>
+          </ul>
+        <li>This app also displays both the current and previous revisions of the document selected below the table of
+            results
+        </li>
+          <ul>
+            <li>The user can scroll though each document to navigate to the relevant Section(s) and look for relevant changes</li>
+          </ul>
+        <li>For each change you can tag its current status:
+        </li>
+          <ul>
+            <li>Not started: Change has not yet been reviewed</li>
+            <li>Reviewed: Change has been reviewed but not addressed</li>
+            <li>Addressed: Change has been reviewed and work has been conducted to address its impact</li>
+          </ul>
+      </ul>
+    </div>
+    </div>
+  
+</div>
+
+<br>
+<div class="container-fluid">
+  <div class="row">
+    <!-- manju - Have changed class for all dropdown divs to 'col-sm-number' from 'col-lg-number'
+         and also commented out the first and last div with class 'col-lg-1 without any content'
+    -->
+
+    <!-- <div class="col-lg-1"></div> -->
+
+    <!-- Document Type Dropdown -->
+    <div class="col-sm-2 text-center">
+      <label for="doc_typ" class="select_label">Select type</label>
+      <br>
+      <select class="btn btn-secondary dropdown-toggle" type="button" id="doc_typ" data-toggle="dropdown"
+        aria-haspopup="true" aria-expanded="false" style="width: 100%;" onchange="doc_select();">
+        <div class="dropdown-menu" aria-labelledby="dropdownMenu2">
+          <option disabled selected value>Select doc type</option>
+          {% for type in DOC_TYPES %}
+          <option value="{{ type }}">{{ type }}</option>
+          {% endfor %}
+        </div>
+      </select>
+      <br><br>
+    </div>
+
+    <!-- Document Selection -->
+    <div class="col-sm-3 text-center"> 
+      <label for="docs" class="">Select document</label>
+      <br>
+      <select id="docs" name="docs" class="btn btn-secondary dropdown-toggle" style="width: 100%;" onchange="recency_select();">
+        <option disabled selected value>Select document type first</option>
+      </select>
+      <br><br>
+    </div>
+
+
+    <!-- Recency Selection -->
+    <!--added a new dropdown to select the option for recency of documents (filters on the current 
+        revision date of documents)-->
+    <div class="col-sm-3 text-center">
+      <label for="recency" class="">Select recency</label>
+      <br>
+      <select id="recency" name="recency" class="btn btn-secondary dropdown-toggle" style="width: 100%;" onchange="sec_select();">
+        <option disabled selected value>Select document first</option>
+      </select>
+      <br><br>
+    </div>
+
+
+    <!-- Section Selection -->
+    <div class="col-sm-2 text-center"> 
+      <label for="sec" class="">Select section</label>
+      <br>
+      <select id="sec" name="sec" class="btn btn-secondary dropdown-toggle" style="width: 100%;"
+        onchange="relevance_select();">
+        <option disabled selected value>Select recency first</option>
+      </select>
+      <br><br>
+    </div>
+
+    <!-- Relevance Selection -->
+    <div class="col-sm-2 text-center">
+      <label for="rel_type" class="">Select relevance</label>
+      <br>
+      <select id="rel_type" name="rel_type" class="btn btn-secondary dropdown-toggle" style="width: 100%;" onchange="doc_change();">
+        <option disabled selected value>Select section first</option>
+      </select>
+      
+      <br><br>
+    </div>
+
+    <!-- <div class="col-lg-1"></div> -->
+
+  </div>
+</div>
+
+<!-- Hiding Key Metrics - to unhide change ~~ to -- in the inline comments -->
+<div id="information" style="Display:none"> 
+  <div class="container-fluid">
+
+    <!-- Key Metrics ~~>
+    <h3 id="chart-title">Key Metrics</h3> -->
+    <div class="row">
+      <!--
+    <div class="col-lg-1"></div> -->
+      <!--
+    
+      <!~~ Current revision ~~>
+      <div class="col-lg-2">
+        <div class="card" id="input-card">
+          <div class="card-body">
+            <h5 id="chart-title">Current Revision</h5>
+            <h3 id='current_rev'></h3>
+          </div>
+        </div>
+      </div>
+
+      <!~~ Previous revision ~~>
+      <div class="col-lg-2">
+        <div class="card" id="input-card">
+          <div class="card-body">
+            <h5 id="chart-title">Previous Revision</h5>
+            <h3 id='previous_rev'></h3>
+          </div>
+        </div>
+      </div> 
+
+      <!~~ Total Changes ~~> -->
+      <div class="col-lg-4">
+        <!--
+        <div class="card" id="input-card"> -->
+          
+          <div class="card-body"> 
+           <!-- <h5 id="chart-title">Total number of changes in the document</h5> -->
+            <h5 id="chart-title" class="text-center">Changes in the document</h5>
+            <h3 id='num_tot_changes'></h3>
+            
+          </div> 
+        <!--</div>-->
+      </div>
+
+      <!-- Section Changes -->
+      <div class="col-lg-4">
+        <!--
+        <div class="card" id="input-card"> -->
+          <div class="card-body">
+         <!--   <h5 id="chart-title">Number of changes in the section</h5> -->
+            <h5 id="chart-title" class="text-center">Changes in the section</h5>
+            <h3 id='num_sec_changes'></h3>
+          </div>
+        
+        <!-- </div> -->
+      </div>
+
+    <!-- Section Changes -->
+      <div class="col-lg-4">
+        <!--
+        <div class="card" id="input-card"> -->
+          <div class="card-body">
+            <!--<h5 id="chart-title">Number of relevant changes in the section</h5>-->
+            <h5 id="chart-title" class="text-center">Relevant changes in the section</h5>
+            <h3 id='num_rel_sec_changes'></h3>
+          </div>
+        <!-- </div> -->
+      </div>
+      <!--
+      <div class="col-lg-1"></div> -->
+    </div>
+    
+  </div> 
+<!--</div> -->
+<!-- Hiding key metrics ends here  -->
+
+  <br><br> <br>
+  <!-- Submit Changes button -->
+  <div>
+  <div class="text-right">
+    <br>
+    <button id='submit_changes' class="btn btn-secondary"  type="button" onclick="save_changes()" >
+      Submit Changes
+    </button>
+  </div> 
+  <!-- Saved changes message on clicking Submit button -->
+  <div id="save_msg"></div>
+  
+</div>
+
+
+
+    <!-- Change Detail Table -->
+    <br>
+    <div id="change_detail_table" style="height:700px;overflow:auto;">
+      <h3 id="table_heading"></h3>
+      <!--
+      <p style="text-align:center;">View the changes that have occured in detail</p>-->
+      <br>
+      <table id="table" class="table table-striped table-bordered table-sm" cellspacing="0" width="100%">
+        
+        <thead>
+          
+          <tr id="table_header">
+            <!--
+            <th scope="col" class="align-top">Revision
+            </th>
+            <th scope="col" class="col-lg-1 align-top">Section Title
+            </th>
+            <th scope="col" class="col-lg-1 align-top">Section Number
+            </th>
+            <th scope="col" class="col-lg-1 align-top">Page Number
+            </th>
+            <th scope="col" class="col-lg-5 align-top">Changes Extracted
+            </th>
+            <!~~ Text amendments and new clauses extracted from the current revision ~~>
+            <!~~
+            <th scope="col">Level of change
+            </th> ~~>
+            <th scope="col" class="align-top">Relevance
+            </th>
+            <th scope="col" class="col-lg-1 align-top">SL Document Links
+            </th>
+            <th scope="col" class="col-lg-2 align-top">Status
+            </th>
+          -->
+          </tr> 
+        </thead>
+
+        <tbody id="detail_df">
+          <tr id="table_row">
+          </tr>
+        </tbody>
+
+      </table>
+    </div>
+
+    <!-- Document Viewer src="static/pdf/UKABWR-GA91-9101-0101-19000-RevC-PB.pdf" height="1000px" -->
+    <br>
+    <br>
+    <h3 id="chart-title">PDF Viewer</h3>
+    <p style="text-align:center;">View the revisions of the documents side-by-side</p>
+    <div class="row">
+
+      <div class="col-lg-6">
+        <div class="card">
+          <div class="card-body">
+            <h5 id="chart-title">Current Revision</h5>
+            <div class="pdf">
+              <iframe id="current_rev_pdf" width="100%" height="1000px"></iframe>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-6">
+        <div class="card">
+          <div class="card-body">
+            <h5 id="chart-title">Previous Revision</h5>
+            <div class="pdf">
+              <iframe id="previous_rev_pdf" width="100%" height="1000px"></iframe>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+
+{% block finalscript %}
+<script>
+  $('#detect_changes').toggleClass('active')
+</script>
+{% endblock %}

@@ -1,0 +1,16 @@
+Flask
+Flask-WTF
+gensim
+Jinja2
+matplotlib
+numpy
+pandas
+pillow
+plotly
+pymssql
+requests
+urllib3
+Werkzeug
+WTForms
+apscheduler
+azure-storage-blob
