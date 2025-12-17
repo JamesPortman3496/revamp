@@ -64,14 +64,14 @@
 
 .dark {
   color-scheme: dark;
-  --background: #05070e;
-  --foreground: #e9edf5;
-  --surface: #0a0f1a;
-  --muted: #121a2a;
-  --muted-foreground: #9aa9c2;
-  --border: #1c2536;
-  --card: #0b101c;
-  --card-foreground: #e9edf5;
+  --background: #080a0f;
+  --foreground: #e6ebf2;
+  --surface: #0d1118;
+  --muted: #151a23;
+  --muted-foreground: #a6afbe;
+  --border: #1f2430;
+  --card: #11141c;
+  --card-foreground: #e6ebf2;
   --accent: #00d084;
   --accent-foreground: #04130f;
   --accent-2: #003946;

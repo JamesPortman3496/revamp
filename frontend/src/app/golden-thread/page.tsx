@@ -1,5 +1,3 @@
-import NavBar from "../../components/layout/navbar";
-
 const dropdowns = [
   { label: "Document type", placeholder: "Select type" },
   { label: "Document", placeholder: "Select document" },
@@ -10,7 +8,6 @@ const dropdowns = [
 export default function GoldenThreadPage() {
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <NavBar />
       <main className="px-8 py-10">
         <div className="max-w-6xl mx-auto space-y-8">
           <header className="bg-card border border-border rounded-2xl p-6 shadow-[var(--shadow-soft)] flex flex-col gap-3">

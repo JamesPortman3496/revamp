@@ -1,5 +1,3 @@
-import NavBar from "../components/layout/navbar";
-
 const recentChanges = [
   { doc: "Placeholder document A", revDate: "2024-12-04", relevant: 8, maybe: 3, notRelevant: 1 },
   { doc: "Placeholder document B", revDate: "2024-11-29", relevant: 4, maybe: 2, notRelevant: 5 },
@@ -9,7 +7,6 @@ const recentChanges = [
 export default function Home() {
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <NavBar />
       <main className="px-8 py-10">
         <div className="max-w-6xl mx-auto space-y-8">
           <header className="bg-card text-card-foreground rounded-2xl border border-border shadow-[var(--shadow-soft)] p-8 text-center space-y-3">

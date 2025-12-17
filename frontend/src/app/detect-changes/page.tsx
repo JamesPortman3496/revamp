@@ -1,8 +1,10 @@
 "use client";
 
-import { useState } from "react";
-import NavBar from "../../components/layout/navbar";
+import { useEffect, useState } from "react";
 import DetectChangesContent, { DetectChangesData } from "./DetectChangesContent";
+import { DOC_TYPES, RECENCY_PERIODS, REL_TYPES } from "@/constants/backend";
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export default function DetectChangesPage() {
   const [showInstructions, setShowInstructions] = useState(false);
@@ -18,24 +20,17 @@ export default function DetectChangesPage() {
   const [selectedRelevance, setSelectedRelevance] = useState("");
   const [isLoadingContent, setIsLoadingContent] = useState(false);
   const [docChangeData, setDocChangeData] = useState<DetectChangesData | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const isDocumentEnabled = Boolean(selectedDocType);
   const isRecencyEnabled = Boolean(selectedDoc);
   const isSectionEnabled = Boolean(selectedRecency);
   const isRelevanceEnabled = Boolean(selectedSection);
 
-  // Fetch doc types on load (falls back to mock if backend unavailable)
-  useState(() => {
-    (async () => {
-      try {
-        const res = await fetch("/api/detect-changes/doc-types");
-        const data = await res.json();
-        setDocTypes(data.doc_types || []);
-      } catch {
-        setDocTypes(["Legislation", "Guidance"]);
-      }
-    })();
-  });
+  // Load static doc types from shared constants on mount.
+  useEffect(() => {
+    setDocTypes([...DOC_TYPES]);
+  }, []);
 
   const handleDocTypeChange = async (value: string) => {
     setSelectedDocType(value);
@@ -48,21 +43,18 @@ export default function DetectChangesPage() {
     setRelevanceOptions([]);
     setSelectedRelevance("");
     setDocChangeData(null);
+    setErrorMessage(null);
     try {
       const res = await fetch(`/api/detect-changes/doc-select?doc_typ=${encodeURIComponent(value)}`);
       const data = await res.json();
       setDocs(data.docs || []);
-    } catch {
-      // mock fallback
-      setDocs(
-        value.toLowerCase() === "legislation"
-          ? ["Legislation Doc A", "Legislation Doc B"]
-          : ["Guidance Doc A", "Guidance Doc B"],
-      );
+    } catch (err) {
+      console.error(err);
+      setErrorMessage("Unable to load documents for the selected type.");
     }
   };
 
-  const handleDocChange = async (value: string) => {
+  const handleDocChange = (value: string) => {
     setSelectedDoc(value);
     setRecencyOptions([]);
     setSelectedRecency("");
@@ -72,13 +64,7 @@ export default function DetectChangesPage() {
     setSelectedRelevance("");
     setDocChangeData(null);
     if (!value) return;
-    try {
-      const res = await fetch("/api/detect-changes/recency");
-      const data = await res.json();
-      setRecencyOptions(data.recency_periods || []);
-    } catch {
-      setRecencyOptions(["1 month", "3 months", "6 months", "1 year", "2 years", "Historical"]);
-    }
+    setRecencyOptions([...RECENCY_PERIODS]);
   };
 
   const handleRecencyChange = async (value: string) => {
@@ -88,6 +74,7 @@ export default function DetectChangesPage() {
     setRelevanceOptions([]);
     setSelectedRelevance("");
     setDocChangeData(null);
+    setErrorMessage(null);
     if (!value || !selectedDocType || !selectedDoc) return;
     try {
       const res = await fetch(
@@ -95,84 +82,75 @@ export default function DetectChangesPage() {
       );
       const data = await res.json();
       setSections(data.sections || []);
-    } catch {
-      setSections(["All sections", "Introduction", "Scope", "Compliance"]);
+    } catch (err) {
+      console.error(err);
+      setErrorMessage("Unable to load sections for the chosen recency.");
     }
   };
 
-  const handleSectionChange = async (value: string) => {
+  const handleSectionChange = (value: string) => {
     setSelectedSection(value);
     setRelevanceOptions([]);
     setSelectedRelevance("");
     setDocChangeData(null);
     if (!value) return;
-    try {
-      const res = await fetch(
-        `/api/detect-changes/relevance?doc_typ=${encodeURIComponent(selectedDocType)}&docs=${encodeURIComponent(selectedDoc)}&recency=${encodeURIComponent(selectedRecency)}&sec=${encodeURIComponent(value)}`,
-      );
-      const data = await res.json();
-      setRelevanceOptions(data.rel_type || []);
-    } catch {
-      setRelevanceOptions(["All", "Relevant", "Maybe", "Not relevant"]);
-    }
+    setRelevanceOptions([...REL_TYPES]);
   };
 
   const handleRelevanceChange = async (value: string) => {
     setSelectedRelevance(value);
     setDocChangeData(null);
+    setErrorMessage(null);
     if (!value) return;
     setIsLoadingContent(true);
+    const startedAt = Date.now();
     try {
       const res = await fetch(
         `/api/detect-changes/doc-change?doc_typ=${encodeURIComponent(selectedDocType)}&docs=${encodeURIComponent(selectedDoc)}&recency=${encodeURIComponent(selectedRecency)}&sec=${encodeURIComponent(selectedSection)}&rel_type=${encodeURIComponent(value)}`,
       );
+      if (!res.ok) {
+        throw new Error("Failed to fetch document changes.");
+      }
       const data = await res.json();
-      setDocChangeData(data);
-    } catch {
+      const rows =
+        (data.rows || []).map((row: any) => ({
+          revision: row.revision ?? row.rev ?? "Revision",
+          sectionTitle: row.sectionTitle ?? row.section ?? "Section",
+          pageNumber: row.pageNumber ?? "—",
+          changesExtracted: row.changesExtracted ?? row.sentence ?? "Change detail",
+          relevance: row.relevance ?? "Relevant",
+          strongLinks: row.strongLinks ?? "—",
+          softLinks: row.softLinks ?? "—",
+          status: row.status ?? "Not started",
+        })) ?? [];
+
       setDocChangeData({
-        metrics: { docChanges: 12, sectionChanges: 4, relevantSectionChanges: 2 },
-        rows: [
-          {
-            revision: "Rev 10 -> Rev 11",
-            sectionTitle: "Compliance",
-            pageNumber: 12,
-            changesExtracted: "Updated compliance threshold from 10% to 12%.",
-            relevance: "Relevant",
-            strongLinks: "Threshold definition",
-            softLinks: "Guidance summary",
-            status: "Reviewed",
-          },
-          {
-            revision: "Rev 10 -> Rev 11",
-            sectionTitle: "Appendix A",
-            pageNumber: 33,
-            changesExtracted: "Added appendix detailing risk assessment.",
-            relevance: "Maybe",
-            strongLinks: "Risk register",
-            softLinks: "Review notes",
-            status: "Not started",
-          },
-          {
-            revision: "Rev 10 -> Rev 11",
-            sectionTitle: "Reporting",
-            pageNumber: 18,
-            changesExtracted: "Clarified reporting cadence to quarterly.",
-            relevance: "Relevant",
-            strongLinks: "Reporting schedule",
-            softLinks: "Team comms",
-            status: "Addressed",
-          },
-        ],
-        revisions: { current: "Current revision placeholder", previous: "Previous revision placeholder" },
+        metrics: {
+          docChanges: data.metrics?.docChanges ?? "—",
+          sectionChanges: data.metrics?.sectionChanges ?? "—",
+          relevantSectionChanges: data.metrics?.relevantSectionChanges ?? "—",
+        },
+        rows,
+        revisions: {
+          current: data.revisions?.current ?? "Current revision placeholder",
+          previous: data.revisions?.previous ?? "Previous revision placeholder",
+        },
       });
+    } catch (err) {
+      console.error(err);
+      setErrorMessage("Unable to load change data for the selected filters.");
     } finally {
+      const elapsed = Date.now() - startedAt;
+      const remaining = Math.max(0, 1000 - elapsed);
+      if (remaining) {
+        await sleep(remaining);
+      }
       setIsLoadingContent(false);
     }
   };
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <NavBar />
       <main className="px-8 py-10">
         <div className="max-w-screen-xl w-full mx-auto space-y-8">
           <header className="bg-card border border-border rounded-2xl p-6 shadow-[var(--shadow-soft)] flex flex-col gap-4">
@@ -202,11 +180,11 @@ export default function DetectChangesPage() {
               </div>
               {showInstructions && (
                 <div className="px-4 py-4 bg-muted/30 border-t border-border text-sm text-foreground">
-            <div className="grid md:grid-cols-2 gap-4">
-              <div className="space-y-3">
-                <div className="flex items-start gap-3">
-                  <span className="mt-1 h-6 w-6 rounded-full bg-accent-3 text-accent-3-foreground flex items-center justify-center text-xs font-semibold">
-                    1
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div className="space-y-3">
+                      <div className="flex items-start gap-3">
+                        <span className="mt-1 h-6 w-6 rounded-full bg-accent-3 text-accent-3-foreground flex items-center justify-center text-xs font-semibold">
+                          1
                         </span>
                         <div>
                           <p className="font-semibold">Purpose</p>
@@ -268,6 +246,11 @@ export default function DetectChangesPage() {
               )}
             </div>
           </header>
+          {errorMessage && (
+            <div className="rounded-2xl border border-accent-3/40 bg-accent-3/10 text-accent-3-foreground px-4 py-3 text-sm">
+              {errorMessage}
+            </div>
+          )}
 
           <section className="grid grid-cols-1 lg:grid-cols-5 gap-4">
             {[
@@ -279,9 +262,7 @@ export default function DetectChangesPage() {
             ].map((item) => (
               <div
                 key={item.label}
-                className={`bg-surface border border-border rounded-xl p-3 transition ${
-                  item.enabled ? "" : "opacity-50"
-                }`}
+                className={`bg-surface border border-border rounded-xl p-3 transition ${item.enabled ? "" : "opacity-50"}`}
                 aria-disabled={!item.enabled}
               >
                 <label className="text-xs uppercase tracking-wide text-muted-foreground">{item.label}</label>
@@ -390,7 +371,7 @@ export default function DetectChangesPage() {
               Loading changes…
             </div>
           )}
-          {docChangeData && <DetectChangesContent data={docChangeData} />}
+          {!isLoadingContent && docChangeData && <DetectChangesContent data={docChangeData} />}
         </div>
       </main>
     </div>
