@@ -31,29 +31,23 @@ export default function GoldenThreadPage() {
             ))}
           </section>
 
-          <section className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-            <div className="bg-card border border-border rounded-2xl p-5 shadow-[var(--shadow-soft)] lg:col-span-2 h-96">
+          <section className="grid grid-cols-1 gap-4">
+            <div className="bg-card border border-border rounded-2xl p-5 shadow-[var(--shadow-soft)] h-96">
               <div className="flex items-center justify-between mb-3">
                 <div>
-                  <h2 className="text-xl font-semibold">Golden thread map</h2>
-                  <p className="text-sm text-muted-foreground">Interactive treemap / network placeholder.</p>
+                  <h2 className="text-xl font-semibold">Golden Thread</h2>
+                  <p className="text-sm text-muted-foreground">
+                    Identifying links between legislative/regulatory changes and our Sellafield Manuals and Practices.
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    An interactive visualisation to go from big picture to detail in one click.
+                  </p>
                 </div>
-                <button className="px-4 py-2 rounded-lg bg-accent-3 text-accent-3-foreground text-sm font-semibold">
-                  Generate
+                <button className="px-4 py-2 rounded-lg bg-accent text-accent-foreground text-sm font-semibold">
+                  Generate Golden Thread
                 </button>
               </div>
               <div className="h-72 rounded-xl border border-border bg-muted/30"></div>
-            </div>
-            <div className="bg-card border border-border rounded-2xl p-5 shadow-[var(--shadow-soft)] space-y-3">
-              <h3 className="text-lg font-semibold">Key insights</h3>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li>• Highlight impacted sections</li>
-                <li>• Show strongest links</li>
-                <li>• Surface confidence / relevancy</li>
-              </ul>
-              <div className="rounded-xl border border-border bg-muted/30 p-3 text-xs text-muted-foreground">
-                This module will consume `/link_rel_select` and `/plot_treemap` data from the backend.
-              </div>
             </div>
           </section>
         </div>

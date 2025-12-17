@@ -32,8 +32,8 @@ export default function DocumentMapPage() {
             ))}
           </section>
 
-          <section className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-            <div className="bg-card border border-border rounded-2xl p-5 shadow-[var(--shadow-soft)] lg:col-span-2 h-96">
+          <section className="grid grid-cols-1 gap-4">
+            <div className="bg-card border border-border rounded-2xl p-5 shadow-[var(--shadow-soft)] h-96">
               <div className="flex items-center justify-between mb-3">
                 <div>
                   <h2 className="text-xl font-semibold">Document map</h2>
@@ -44,17 +44,6 @@ export default function DocumentMapPage() {
                 </button>
               </div>
               <div className="h-72 rounded-xl border border-border bg-muted/30"></div>
-            </div>
-            <div className="bg-card border border-border rounded-2xl p-5 shadow-[var(--shadow-soft)] space-y-4">
-              <h3 className="text-lg font-semibold">Impact summary</h3>
-              <div className="space-y-2 text-sm text-muted-foreground">
-                <p>• Key impacted clauses</p>
-                <p>• Potential downstream changes</p>
-                <p>• Suggested owners / actions</p>
-              </div>
-              <div className="rounded-xl border border-border bg-muted/30 p-3 text-xs text-muted-foreground">
-                This page will consume the document map endpoints as we wire the API layer.
-              </div>
             </div>
           </section>
         </div>
