@@ -1,33 +1,92 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --color-surface: var(--surface);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent-2: var(--accent-2);
+  --color-accent-2-foreground: var(--accent-2-foreground);
+  --color-accent-3: var(--accent-3);
+  --color-accent-3-foreground: var(--accent-3-foreground);
+  --color-ring: var(--ring);
+  --font-sans: var(--font-manrope);
   --font-mono: var(--font-geist-mono);
+  --shadow-soft: var(--shadow-soft);
 }
 
-/* Dark mode variables */
+:root {
+  color-scheme: light;
+  --background: #f4f6fb;
+  --foreground: #0f172a;
+  --surface: #ffffff;
+  --muted: #e5e7eb;
+  --muted-foreground: #4b5563;
+  --border: #e2e8f0;
+  --card: #ffffff;
+  --card-foreground: #0f172a;
+  --accent: #003946; /* deep teal from Sellafield careers */
+  --accent-foreground: #e6f4f2;
+  --accent-2: #00d084; /* bright mint secondary */
+  --accent-2-foreground: #01251d;
+  --accent-3: #fcb900; /* vivid yellow accent */
+  --accent-3-foreground: #1f1400;
+  --ring: rgba(0, 57, 70, 0.28);
+  --shadow-soft: 0 20px 60px rgba(15, 23, 42, 0.06);
+}
+
+.light {
+  color-scheme: light;
+  --background: #f4f6fb;
+  --foreground: #0f172a;
+  --surface: #ffffff;
+  --muted: #e5e7eb;
+  --muted-foreground: #4b5563;
+  --border: #e2e8f0;
+  --card: #ffffff;
+  --card-foreground: #0f172a;
+  --accent: #003946;
+  --accent-foreground: #e6f4f2;
+  --accent-2: #00d084;
+  --accent-2-foreground: #01251d;
+  --accent-3: #fcb900;
+  --accent-3-foreground: #1f1400;
+  --ring: rgba(0, 57, 70, 0.28);
+  --shadow-soft: 0 20px 60px rgba(15, 23, 42, 0.06);
+}
+
 .dark {
-  --background: #0a0a0a;
-  --foreground: #ededed;
-}
-
-/* Fallback for system preference if no manual toggle */
-@media (prefers-color-scheme: dark) {
-  :root:not(.dark) {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  color-scheme: dark;
+  --background: #05070e;
+  --foreground: #e9edf5;
+  --surface: #0a0f1a;
+  --muted: #121a2a;
+  --muted-foreground: #9aa9c2;
+  --border: #1c2536;
+  --card: #0b101c;
+  --card-foreground: #e9edf5;
+  --accent: #00d084;
+  --accent-foreground: #04130f;
+  --accent-2: #003946;
+  --accent-2-foreground: #e2f2f0;
+  --accent-3: #fcb900;
+  --accent-3-foreground: #0d0a02;
+  --ring: rgba(0, 208, 132, 0.35);
+  --shadow-soft: 0 24px 70px rgba(0, 0, 0, 0.55);
 }
 
 body {
-  background: var(--background);
+  background: radial-gradient(circle at 20% 20%, rgba(37, 99, 235, 0.06), transparent 35%),
+    radial-gradient(circle at 80% 0%, rgba(124, 195, 255, 0.08), transparent 30%),
+    var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-manrope), system-ui, -apple-system, sans-serif;
+  transition: background-color 200ms ease, color 200ms ease, background 200ms ease;
 }
